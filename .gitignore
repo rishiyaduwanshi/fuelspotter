@@ -1,0 +1,14 @@
+formula.md
+demo
+venv
+.env
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
