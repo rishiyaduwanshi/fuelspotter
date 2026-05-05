@@ -1,0 +1,159 @@
+{
+  "info": {
+    "_postman_id": "301e6f98-7c0e-4548-b460-fa902c556fc2",
+    "name": "FuelSpotter API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33766937"
+  },
+  "item": [
+    {
+      "name": "API Index",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"Chicago, IL\",\n  \"end\": \"Madison, WI\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Route (geocode + OSRM)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"start\": \"Chicago, IL\",\n  \"end\": \"Madison, WI\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/route",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "route"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Fuel Routes (route + fuel stops + total cost)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"start_location\": \"Dallas, TX\",\n    \"end_location\": \"Los Angeles, CA\",\n    \"include_geometry_coordinates\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/fuel-routes/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "fuel-routes",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "404 JSON (API missing endpoint)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/does-not-exist/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "does-not-exist",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ]
+}
