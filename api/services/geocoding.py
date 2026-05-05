@@ -7,6 +7,7 @@ from typing import Any
 from django.core.cache import cache
 
 from .http import HttpError, get_json
+from .us_states import to_usps_state_code
 
 
 @dataclass(frozen=True)
@@ -119,17 +120,25 @@ def reverse_geocode_us(lat: float, lon: float, *, timeout_s: float = 10.0) -> Re
     if not isinstance(address, dict):
         raise GeocodingError('Unexpected reverse geocoding response')
 
-    state = address.get('state_code') or address.get('state')
-    if isinstance(state, str) and len(state) > 2:
-        # Nominatim sometimes returns full state name; try to keep 2-letter codes if possible.
-        # If it is a full name, we keep it as-is.
-        pass
+    # Prefer USPS 2-letter state code.
+    state = address.get('state_code')
+    if not state:
+        # Some responses use ISO3166-2 keys like "US-TX".
+        for iso_key in ('ISO3166-2-lvl4', 'ISO3166-2-lvl5', 'ISO3166-2-lvl6'):
+            iso_val = address.get(iso_key)
+            if isinstance(iso_val, str) and iso_val:
+                state = iso_val
+                break
+    if not state:
+        state = address.get('state')
+
+    state_code = to_usps_state_code(state) if isinstance(state, str) else None
 
     city = address.get('city') or address.get('town') or address.get('village')
 
     result = ReverseGeocodeResult(
         city=str(city) if city else None,
-        state=str(state) if state else None,
+        state=state_code,
     )
     cache.set(cache_key, result.__dict__, timeout=60 * 60 * 24)
     return result

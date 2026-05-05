@@ -9,6 +9,7 @@ from api.models import TruckStop
 from api.services.geo import LatLon, sample_linestring_every_miles
 from api.services.geocoding import reverse_geocode_us
 from api.services.optimizefuel import Station, optimize_fuel
+from api.services.us_states import to_usps_state_code
 
 
 MILES_PER_METER = 1.0 / 1609.344
@@ -22,11 +23,12 @@ class CandidatePoint:
     state: str | None
 
 
+class FuelPlanningError(RuntimeError):
+    pass
+
+
 def _state_code(state_value: str | None) -> str | None:
-    if not state_value:
-        return None
-    s = state_value.strip().upper()
-    return s[:2] if len(s) >= 2 else None
+    return to_usps_state_code(state_value)
 
 
 def build_state_profile_from_route(
@@ -133,7 +135,7 @@ def plan_fuel_stops_for_route(
             st0 = station_by_state[profile_points[0].state]
             stations.insert(0, Station(distance=0.0, price=float(st0.retail_price)))
         else:
-            raise RuntimeError('Could not determine starting fuel price')
+            raise FuelPlanningError('Could not determine starting fuel price')
 
     optimized = optimize_fuel(
         stations,

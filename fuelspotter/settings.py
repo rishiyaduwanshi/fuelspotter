@@ -126,11 +126,13 @@ if DEBUG:
         'DEFAULT_RENDERER_CLASSES': [
             'rest_framework.renderers.JSONRenderer',
             'rest_framework.renderers.BrowsableAPIRenderer',
-        ]
+        ],
+        'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
     }
 else:
     REST_FRAMEWORK = {
         'DEFAULT_RENDERER_CLASSES': [
             'rest_framework.renderers.JSONRenderer',
-        ]
+        ],
+        'EXCEPTION_HANDLER': 'api.exception_handler.custom_exception_handler',
     }
