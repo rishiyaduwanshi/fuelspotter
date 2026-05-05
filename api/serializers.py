@@ -15,3 +15,4 @@ class RoutePlanResponseSerializer(serializers.Serializer):
 class FuelRoutePlanRequestSerializer(serializers.Serializer):
     start_location = serializers.CharField()
     end_location = serializers.CharField()
+    include_geometry_coordinates = serializers.BooleanField(required=False, default=False)

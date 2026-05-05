@@ -54,25 +54,23 @@ def build_state_profile_from_route(
             )
         )
 
-    # Keep order by distance and drop consecutive duplicates of state.
+    # Keep order by distance.
     points.sort(key=lambda p: p.distance_miles)
-    compressed: list[CandidatePoint] = []
-    last_state = None
-    for p in points:
-        if not compressed:
-            compressed.append(p)
-            last_state = p.state
-            continue
-        if p.state and p.state == last_state:
-            continue
-        compressed.append(p)
-        last_state = p.state
 
     # Ensure we keep the final point.
-    if points and compressed and compressed[-1].distance_miles != points[-1].distance_miles:
-        compressed.append(points[-1])
+    if points and points[-1].distance_miles != float(samples[-1][0]):
+        dist_miles, ll = samples[-1]
+        rev = reverse_geocode_us(ll.lat, ll.lon)
+        points.append(
+            CandidatePoint(
+                distance_miles=float(dist_miles),
+                point=ll,
+                city=rev.city,
+                state=_state_code(rev.state),
+            )
+        )
 
-    return compressed
+    return points
 
 
 def cheapest_station_per_state(states: list[str]) -> dict[str, TruckStop]:
@@ -137,13 +135,16 @@ def plan_fuel_stops_for_route(
         else:
             raise FuelPlanningError('Could not determine starting fuel price')
 
-    optimized = optimize_fuel(
-        stations,
-        total_distance_miles,
-        tank_capacity_miles=tank_range_miles,
-        mpg=mpg,
-        start_fuel_miles=start_fuel_miles,
-    )
+    try:
+        optimized = optimize_fuel(
+            stations,
+            total_distance_miles,
+            tank_capacity_miles=tank_range_miles,
+            mpg=mpg,
+            start_fuel_miles=start_fuel_miles,
+        )
+    except (RuntimeError, ValueError) as exc:
+        raise FuelPlanningError(str(exc)) from exc
 
     # Helper: find the latest profile point at/before a distance.
     def point_for_distance(d: float) -> CandidatePoint:

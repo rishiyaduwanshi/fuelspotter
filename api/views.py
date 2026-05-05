@@ -88,6 +88,7 @@ class FuelRoutePlanView(APIView):
 
 		start_q = serializer.validated_data['start_location']
 		end_q = serializer.validated_data['end_location']
+		include_geometry_coordinates = serializer.validated_data.get('include_geometry_coordinates', False)
 
 		try:
 			start = geocode_us_place(start_q)
@@ -114,6 +115,10 @@ class FuelRoutePlanView(APIView):
 		distance_miles = route.distance_m / 1609.344
 		duration_minutes = route.duration_s / 60.0
 
+		route_geometry = route.geometry
+		if not include_geometry_coordinates and isinstance(route_geometry, dict):
+			route_geometry = {'type': route_geometry.get('type', 'LineString')}
+
 		return Response(
 			{
 				'route': {
@@ -121,7 +126,7 @@ class FuelRoutePlanView(APIView):
 					'end_location': end_q,
 					'distance_miles': distance_miles,
 					'estimated_duration_minutes': duration_minutes,
-					'geometry': route.geometry,
+					'geometry': route_geometry,
 					'bbox': route.bbox,
 				},
 				'fuel_stops': plan['fuel_stops'],
