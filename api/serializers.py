@@ -10,3 +10,8 @@ class RoutePlanResponseSerializer(serializers.Serializer):
     start = serializers.DictField()
     end = serializers.DictField()
     route = serializers.DictField()
+
+
+class FuelRoutePlanRequestSerializer(serializers.Serializer):
+    start_location = serializers.CharField()
+    end_location = serializers.CharField()

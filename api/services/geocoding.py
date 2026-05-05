@@ -16,6 +16,12 @@ class GeocodeResult:
     display_name: str
 
 
+@dataclass(frozen=True)
+class ReverseGeocodeResult:
+    city: str | None
+    state: str | None
+
+
 class GeocodingError(RuntimeError):
     pass
 
@@ -23,6 +29,12 @@ class GeocodingError(RuntimeError):
 def _cache_key_for_query(query: str) -> str:
     digest = hashlib.sha256(query.lower().encode('utf-8')).hexdigest()
     return f"geocode:nominatim:us:{digest}"
+
+
+def _cache_key_for_reverse(lat: float, lon: float) -> str:
+    raw = f"{lat:.5f},{lon:.5f}"
+    digest = hashlib.sha256(raw.encode('utf-8')).hexdigest()
+    return f"revgeocode:nominatim:us:{digest}"
 
 
 def geocode_us_place(query: str, *, timeout_s: float = 10.0) -> GeocodeResult:
@@ -70,5 +82,54 @@ def geocode_us_place(query: str, *, timeout_s: float = 10.0) -> GeocodeResult:
     except Exception as exc:
         raise GeocodingError('Unexpected geocoding response') from exc
 
+    cache.set(cache_key, result.__dict__, timeout=60 * 60 * 24)
+    return result
+
+
+def reverse_geocode_us(lat: float, lon: float, *, timeout_s: float = 10.0) -> ReverseGeocodeResult:
+    cache_key = _cache_key_for_reverse(lat, lon)
+    cached = cache.get(cache_key)
+    if cached:
+        return ReverseGeocodeResult(**cached)
+
+    url = 'https://nominatim.openstreetmap.org/reverse'
+    params: dict[str, Any] = {
+        'lat': lat,
+        'lon': lon,
+        'format': 'json',
+        'zoom': 10,
+        'addressdetails': 1,
+        'countrycodes': 'us',
+    }
+
+    try:
+        res = get_json(
+            url,
+            params=params,
+            headers={
+                'User-Agent': 'fuelspotter-assignment/1.0 (contact: local-dev)',
+            },
+            timeout_s=timeout_s,
+        )
+    except HttpError as exc:
+        raise GeocodingError(str(exc)) from exc
+
+    data = res.json
+    address = data.get('address') if isinstance(data, dict) else None
+    if not isinstance(address, dict):
+        raise GeocodingError('Unexpected reverse geocoding response')
+
+    state = address.get('state_code') or address.get('state')
+    if isinstance(state, str) and len(state) > 2:
+        # Nominatim sometimes returns full state name; try to keep 2-letter codes if possible.
+        # If it is a full name, we keep it as-is.
+        pass
+
+    city = address.get('city') or address.get('town') or address.get('village')
+
+    result = ReverseGeocodeResult(
+        city=str(city) if city else None,
+        state=str(state) if state else None,
+    )
     cache.set(cache_key, result.__dict__, timeout=60 * 60 * 24)
     return result
