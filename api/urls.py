@@ -1,10 +1,10 @@
-from django.urls import path
+from django.urls import re_path
 
 from .views import ApiIndexView, FuelRoutePlanView, HealthView, RoutePlanView
 
 urlpatterns = [
-    path('', ApiIndexView.as_view(), name='api-index'),
-    path('health/', HealthView.as_view(), name='health'),
-    path('route/', RoutePlanView.as_view(), name='route-plan'),
-    path('fuel-routes/', FuelRoutePlanView.as_view(), name='fuel-routes'),
+    re_path(r'^$', ApiIndexView.as_view(), name='api-index'),
+    re_path(r'^health/?$', HealthView.as_view(), name='health'),
+    re_path(r'^route/?$', RoutePlanView.as_view(), name='route-plan'),
+    re_path(r'^fuel-routes/?$', FuelRoutePlanView.as_view(), name='fuel-routes'),
 ]
