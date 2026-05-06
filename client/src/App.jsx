@@ -13,6 +13,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 })
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim()
+
+function apiUrl(pathname) {
+  if (!API_BASE_URL) return pathname
+  return new URL(pathname, API_BASE_URL).toString()
+}
+
 function money(value) {
   const numberValue = Number(value)
   if (!Number.isFinite(numberValue)) return '—'
@@ -95,7 +102,7 @@ export default function App() {
     setData(null)
 
     try {
-      const res = await fetch('/api/fuel-routes/', {
+      const res = await fetch(apiUrl('/api/fuel-routes/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -247,7 +254,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="h-[520px]">
+          <div className="h-130">
             <MapContainer
               center={[39.8283, -98.5795]}
               zoom={4}
