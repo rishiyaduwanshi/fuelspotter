@@ -1,0 +1,24 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: 139.59.37.74
+          username: root
+          key: ${{ secrets.FUELSPOTTER_DEPLOY_KEY }}
+          timeout: 5m
+          script: |
+            set -e
+            cd /root/fuelspotter
+            chmod +x deploy.sh
+            ./deploy.sh

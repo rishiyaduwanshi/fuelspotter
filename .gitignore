@@ -12,4 +12,7 @@ venv
 *.pyc
 db.sqlite3
 db.sqlite3-journal
-.github
+.github/assignment.md
+!.github/workflows/
+!.github/workflows/*.yml
+!.github/workflows/*.yaml
