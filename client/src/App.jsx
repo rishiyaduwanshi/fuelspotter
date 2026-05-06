@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet'
 import L from 'leaflet'
 
+import { US_STATES, US_STATES_BY_CODE } from './data/us_states'
+
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -58,11 +60,14 @@ function FitBounds({ bounds }) {
 }
 
 export default function App() {
-  const [startLocation, setStartLocation] = useState('Dallas, TX')
-  const [endLocation, setEndLocation] = useState('Los Angeles, CA')
+  const [startState, setStartState] = useState('TX')
+  const [endState, setEndState] = useState('CA')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [data, setData] = useState(null)
+
+  const startLocation = US_STATES_BY_CODE[startState]?.name || ''
+  const endLocation = US_STATES_BY_CODE[endState]?.name || ''
 
   const routeLine = data?.route?.geometry
   const routeCoordinates = useMemo(() => {
@@ -143,21 +148,31 @@ export default function App() {
             <div className="grid grid-cols-1 gap-3">
               <label className="block">
                 <div className="text-xs font-medium text-slate-300">Start location</div>
-                <input
-                  value={startLocation}
-                  onChange={(e) => setStartLocation(e.target.value)}
-                  placeholder="e.g. Dallas, TX"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                />
+                <select
+                  value={startState}
+                  onChange={(e) => setStartState(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                >
+                  {US_STATES.map((s) => (
+                    <option key={s.code} value={s.code}>
+                      {s.name} ({s.code})
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block">
                 <div className="text-xs font-medium text-slate-300">End location</div>
-                <input
-                  value={endLocation}
-                  onChange={(e) => setEndLocation(e.target.value)}
-                  placeholder="e.g. Los Angeles, CA"
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                />
+                <select
+                  value={endState}
+                  onChange={(e) => setEndState(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                >
+                  {US_STATES.map((s) => (
+                    <option key={s.code} value={s.code}>
+                      {s.name} ({s.code})
+                    </option>
+                  ))}
+                </select>
               </label>
               <button
                 type="submit"
