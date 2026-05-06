@@ -42,11 +42,13 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'api',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -55,6 +57,11 @@ MIDDLEWARE = [
 
     'fuelspotter.middleware.ApiJson404Middleware',
 ]
+
+# CORS (for the Vite dev server / separate client origin)
+CORS_URLS_REGEX = r'^/api/.*$'
+CORS_ALLOW_ALL_ORIGINS = conf.env_bool('CORS_ALLOW_ALL_ORIGINS', default=False)
+CORS_ALLOWED_ORIGINS = conf.env_list('CORS_ALLOWED_ORIGINS', default=[])
 
 ROOT_URLCONF = 'fuelspotter.urls'
 
