@@ -2,6 +2,14 @@
 
 API that takes a start + end location within the USA, fetches a driving route (free OSRM), and returns an approximate fuel-stop plan optimized for cost using the provided `fuelPrices.csv` dataset.
 
+## Quick Links
+
+- Live Backend: https://fuelspotter.iamabhinav.dev/api/
+- Live Frontend: https://fuelspotter.pages.dev/
+- Postman collection (GitHub): https://github.com/rishiyaduwanshi/fuelspotter/blob/main/FuelSpotter%20API.postman_collection.json
+
+![FuelSpotter UI](image.png)
+
 > Note: The provided fuel price dataset does **not** include station latitude/longitude. This project therefore uses a **route sampling + reverse geocoding** approach to infer the region/state along the route, then picks cost-effective prices for those regions. This is an approximation and is documented under **Limitations**.
 
 ## Tech
@@ -72,9 +80,22 @@ python seeds/fuelprices_seed.py
 python manage.py runserver
 ```
 
+## Live URLs
+
+- API (prod): https://fuelspotter.iamabhinav.dev/api/
+- Client (prod): https://fuelspotter.pages.dev/
+
+## Deployment notes (extra)
+
+- Backend is hosted on a DigitalOcean VPS.
+- Client is hosted on Cloudflare Pages.
+- CI/CD via GitHub Actions.
+
 ## API
 
-Base: `http://127.0.0.1:8000/api`
+Base (local): `http://127.0.0.1:8000/api`
+
+Base (prod): `https://fuelspotter.iamabhinav.dev/api`
 
 ### GET `/api/`
 Lists available endpoints.
@@ -137,4 +158,5 @@ Unknown `/api/*` routes return JSON (not Django HTML pages).
 
 ## Postman
 
-- Postman collection: `/postman_collection.json`
+- Postman collection (repo file): `FuelSpotter API.postman_collection.json`
+- Postman collection (GitHub): https://github.com/rishiyaduwanshi/fuelspotter/blob/main/FuelSpotter%20API.postman_collection.json
